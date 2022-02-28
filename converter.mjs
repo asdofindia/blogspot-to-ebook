@@ -97,10 +97,10 @@ while (currentUrl) {
   });
 }
 
-const title = process.argv[4] || "Title"
-const creator = process.argv[5] || "Author"
+const title = process.argv[4] || "Title";
+const creator = process.argv[5] || "Author";
 
-const identifier = (title + creator).replace(/\W/g, ".")
+const identifier = `${title}.${creator}`.replace(/\W/g, ".");
 
 const option = {
   outputPath: process.argv[3] || "output.epub",
