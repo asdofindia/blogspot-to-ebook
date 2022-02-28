@@ -20,6 +20,8 @@ const setCache = (key, data) => {
   fs.writeFileSync(keyToFilePath(key), JSON.stringify(data));
 };
 
+const createId = (seed) => `id-${keyToHash(seed)}`;
+
 const fetchUrlText = async (url) => {
   const cached = getCache(url);
   if (cached) return cached;
@@ -45,9 +47,7 @@ const domToStructured = (dom) => {
   return {
     title,
     older: dom.window.document.querySelector(olderSelector)?.href,
-    id: dom.window.document
-      .querySelector(timeStampSelector)
-      ?.href?.replace(/\W/g, "_"),
+    id: createId(dom.window.document.querySelector(timeStampSelector)?.href),
     bodyDom: dom.window.document.querySelector(bodySelector),
   };
 };
@@ -62,7 +62,7 @@ const swapResources = async (resources, dom) => {
     const blob = await res.arrayBuffer();
     const mediaType = res.headers.get("content-type");
     resources[href] = {
-      id: href.replace(/\W/g, "_"),
+      id: createId(href),
       mediaType,
       content: Buffer.from(blob),
     };
