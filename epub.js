@@ -1,3 +1,23 @@
+/*
+epub.js epub generating code
+Copyright (C) 2022 Akshay S Dinesh
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+Find Akshay's contact details at https://asd.learnlearn.in/about/#contact 
+*/
+
 // An epub file is just a specialized zip archive
 const archiver = require("archiver");
 // The content is xhtml. It can be supplied by user as html
