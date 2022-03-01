@@ -21,3 +21,15 @@ Here's a tool for you
 ## Cleaning cache
 
 Network requests are cached in `.cache` to avoid repeated queries. Delete the folder to clean up cache.
+
+## Participating
+
+If you want to add features, fix bugs, add documentation, or participate in this project in any manner, you are welcome to.
+
+Do be nice to everyone and be constructive.
+
+For code contributions, a nice git workflow can be read in [webogram's contribution guide](https://github.com/zhukov/webogram/blob/master/CONTRIBUTING.md).
+
+Issues can be found and filed [here](https://github.com/asdofindia/blogspot-to-ebook/issues).
+
+Code gets licensed in AGPL.
