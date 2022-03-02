@@ -41,6 +41,13 @@ const setCache = (key, data) => {
 };
 
 const createId = (seed) => `id-${keyToHash(seed)}`;
+const escapeHtml = (html) =>
+  html
+    // https://stackoverflow.com/a/1091953
+    // says that only < & & needs replacement
+    // because >, ', and " are allowed in text
+    .replace(/</g, "&lt;")
+    .replace(/&/g, "&amp;");
 
 const fetchUrlText = async (url) => {
   const cached = getCache(url);
@@ -100,15 +107,16 @@ const resources = {};
 while (currentUrl) {
   await fetchPost(currentUrl).then(async ({ title, bodyDom, older, id }) => {
     console.log(title);
+    const escapedTitle = escapeHtml(title);
     const domSwappedWithLocalImages = await swapResources(resources, bodyDom);
     const contentHtml = xmlserializer.serializeToString(
       domSwappedWithLocalImages
     );
     chapters.unshift({
       id,
-      title,
+      title: escapedTitle,
       content: `<div>
-          <h1>${title}</h1>
+          <h1>${escapedTitle}</h1>
           <div><p><a href="${currentUrl}">Link to original</a></p></div>
           <div>${contentHtml}</div>
         </div>`,
