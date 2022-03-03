@@ -95,6 +95,7 @@ export const swapResources = async (resources, dom) => {
     }
     if (resources[href]) {
       node.src = `./${resources[href]?.id}`;
+      node.srcset = "";
     }
   }
   return dom;

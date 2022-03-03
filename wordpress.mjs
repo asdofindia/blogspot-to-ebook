@@ -30,12 +30,17 @@ const domToStructured = (dom) => {
     dom.window.document.querySelector(titleSelector)?.textContent?.trim() ||
     "Untitled";
 
+  const bodyDom = dom.window.document.querySelector(bodySelector);
+  [...bodyDom?.querySelectorAll(".sharedaddy")].map((n) =>
+    n.parentNode.removeChild(n)
+  );
+
   return {
     title,
     older: dom.window.document.querySelector(olderSelector)?.href,
     newer: dom.window.document.querySelector(newerSelector)?.href,
     id: createId(dom.window.document.URL),
-    bodyDom: dom.window.document.querySelector(bodySelector),
+    bodyDom,
     url: dom.window.document.URL,
   };
 };
