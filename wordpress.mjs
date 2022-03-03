@@ -31,7 +31,7 @@ const domToStructured = (dom) => {
     "Untitled";
 
   const bodyDom = dom.window.document.querySelector(bodySelector);
-  [...bodyDom?.querySelectorAll(".sharedaddy")].map((n) =>
+  [...bodyDom?.querySelectorAll(".sharedaddy, .jp-relatedposts")].map((n) =>
     n.parentNode.removeChild(n)
   );
 
