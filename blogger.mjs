@@ -21,6 +21,7 @@ Find Akshay's contact details at https://asd.learnlearn.in/about/#contact
 import { urlToDom, createId } from "./utils.mjs";
 
 const olderSelector = "a.blog-pager-older-link";
+const newerSelector = "a.blog-pager-newer-link";
 const titleSelector = ".post-title";
 const bodySelector = ".entry-content";
 const timeStampSelector = ".timestamp-link";
@@ -32,6 +33,7 @@ const domToStructured = (dom) => {
   return {
     title,
     older: dom.window.document.querySelector(olderSelector)?.href,
+    newer: dom.window.document.querySelector(newerSelector)?.href,
     id: createId(dom.window.document.querySelector(timeStampSelector)?.href),
     bodyDom: dom.window.document.querySelector(bodySelector),
     url: dom.window.document.URL,
@@ -40,7 +42,7 @@ const domToStructured = (dom) => {
 
 const getOneBloggerPost = (postUrl) => urlToDom(postUrl).then(domToStructured);
 
-export const getFromBlogger = async (startUrl) => {
+export const getOlderPostsFrom = async (startUrl) => {
   let currentUrl = startUrl;
   const chapters = [];
 
@@ -53,4 +55,45 @@ export const getFromBlogger = async (startUrl) => {
     });
   }
   return chapters;
+};
+
+const getListPage = async (url) => {
+  const dom = await urlToDom(url);
+  const hasArchive = !!dom.window.document.querySelector("ul.hierarchy");
+  const posts = [...dom.window.document.querySelectorAll(".post-title a")].map(
+    (a) => a?.href
+  );
+  const older = dom.window.document.querySelector(olderSelector)?.href;
+  return {
+    posts,
+    hasArchive,
+    older,
+  };
+};
+
+const getAllPostLinks = async (url) => {
+  let currentUrl = url;
+  let links = [];
+
+  while (currentUrl) {
+    const { posts, older } = await getListPage(currentUrl);
+    links = links.concat(posts);
+    currentUrl = older;
+  }
+
+  links.reverse();
+  return links;
+};
+
+const getPostsFromList = async (url) => {
+  const allLinks = await getAllPostLinks(url);
+  return await Promise.all(allLinks.map((link) => getOneBloggerPost(link)));
+};
+
+export const getFromBlogger = (url) => {
+  const parsedUrl = new URL(url);
+  if (parsedUrl.pathname.endsWith(".html")) {
+    return getOlderPostsFrom(url);
+  }
+  return getPostsFromList(url);
 };

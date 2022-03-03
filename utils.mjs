@@ -54,7 +54,7 @@ const fetchUrlText = async (url) => {
     console.log(`Got ${url} from cache`);
     return cached;
   }
-  console.log(`Downloading post ${url}...`);
+  console.log(`Downloading text ${url}...`);
   return fetch(url).then(async (res) => {
     const text = await res.text();
     setCache(url, text);
@@ -105,4 +105,12 @@ export const processBlogPosts = async (blogPosts) => {
     })
   );
   return { chapters, resources: Object.values(resources) };
+};
+
+export const mapOnNodeList = (nodelist, func) => {
+  const result = [];
+  for (const node of nodelist) {
+    result.push(func(node));
+  }
+  return result;
 };
