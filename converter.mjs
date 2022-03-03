@@ -25,10 +25,10 @@ import { processBlogPosts } from "./utils.mjs";
 import { getFromWordPress } from "./wordpress.mjs";
 
 const detectPlatform = (url) => {
-  if (url.includes("blogspot")) {
+  if (url?.includes("blogspot")) {
     return "blogger";
   }
-  if (url.includes("wordpress")) {
+  if (url?.includes("wordpress")) {
     return "wordpress";
   }
 };
