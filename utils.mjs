@@ -65,7 +65,7 @@ const fetchUrlText = async (url) => {
 export const urlToDom = (url) =>
   fetchUrlText(url).then((text) => new JSDOM(text, { url }));
 
-export const swapResources = async (resources, dom) => {
+const swapResources = async (resources, dom) => {
   const nodelist = dom.querySelectorAll("img");
   for (const node of nodelist) {
     const href = node.src;
@@ -121,12 +121,4 @@ export const processBlogPosts = async (blogPosts) => {
     });
   }
   return { chapters, resources: Object.values(resources) };
-};
-
-export const mapOnNodeList = (nodelist, func) => {
-  const result = [];
-  for (const node of nodelist) {
-    result.push(func(node));
-  }
-  return result;
 };

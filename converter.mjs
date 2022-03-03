@@ -18,6 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 Find Akshay's contact details at https://asd.learnlearn.in/about/#contact 
 */
 
+import inquirer from "inquirer";
 import { getFromBlogger } from "./blogger.mjs";
 import { createEpub } from "./epub.js";
 import { processBlogPosts } from "./utils.mjs";
@@ -30,36 +31,64 @@ const detectPlatform = (url) => {
   if (url.includes("wordpress")) {
     return "wordpress";
   }
-  console.error(
-    "Could not detect whether blogger/wordpress from url. Pass the last parameter"
-  );
-  process.exit(1);
 };
-const url = process.argv[2];
-const platform = process.argv[6] || detectPlatform(url);
 
 const engines = {
   blogger: getFromBlogger,
   wordpress: getFromWordPress,
 };
 
-const blogPosts = await engines[platform](url);
+const url = process.argv[2];
+const outputPath = process.argv[3];
+const title = process.argv[4];
+const creator = process.argv[5];
+const platform = process.argv[6] || detectPlatform(url);
+
+const confirmed = await inquirer.prompt(
+  [
+    {
+      type: "input",
+      name: "url",
+    },
+    {
+      type: "input",
+      name: "outputPath",
+      default: "output.epub"
+    },
+    {
+      type: "input",
+      name: "title",
+      default: "Title"
+    },
+    {
+      type: "input",
+      name: "creator",
+      default: "Creator"
+    },
+    {
+      type: "list",
+      name: "platform",
+      choices: ["blogger", "wordpress"],
+    },
+  ],
+  { url, outputPath, title, creator, platform }
+);
+
+const blogPosts = await engines[confirmed.platform](confirmed.url);
 
 const { chapters, resources } = await processBlogPosts(blogPosts);
-
-const title = process.argv[4] || "Title";
-const creator = process.argv[5] || "Author";
 
 const identifier = `${title}.${creator}`.replace(/\W/g, ".");
 
 const option = {
-  outputPath: process.argv[3] || "output.epub",
-  title,
-  creator,
+  outputPath: confirmed.outputPath,
+  title: confirmed.title,
+  creator: confirmed.creator,
   language: "en",
   identifier,
   chapters,
   resources,
 };
 
-createEpub(option).then(() => console.log("done"));
+await createEpub(option);
+console.log(`Output ready at ${confirmed.outputPath}`);

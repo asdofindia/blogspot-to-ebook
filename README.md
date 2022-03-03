@@ -16,6 +16,11 @@ Here's a tool for you
 
 ## Running
 
+### Interactively
+
+* `node --experimental-fetch converter.mjs`
+* Answer questions
+
 ### For blogger with non-modern themes
 
 * Get to the URL of the latest (newest) post in the blog. (The tool will go find older links starting from this post)
