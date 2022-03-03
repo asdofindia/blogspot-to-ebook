@@ -86,24 +86,23 @@ export const swapResources = async (resources, dom) => {
 
 export const processBlogPosts = async (blogPosts) => {
   const resources = {};
-  const chapters = await Promise.all(
-    blogPosts.map(async ({ title, bodyDom, id, url }) => {
-      const escapedTitle = escapeHtml(title);
-      const domSwappedWithLocalImages = await swapResources(resources, bodyDom);
-      const contentHtml = xmlserializer.serializeToString(
-        domSwappedWithLocalImages
-      );
-      return {
-        id,
-        title: escapedTitle,
-        content: `<div>
+  const chapters = [];
+  for await (const { title, bodyDom, id, url } of blogPosts) {
+    const escapedTitle = escapeHtml(title);
+    const domSwappedWithLocalImages = await swapResources(resources, bodyDom);
+    const contentHtml = xmlserializer.serializeToString(
+      domSwappedWithLocalImages
+    );
+    chapters.unshift({
+      id,
+      title: escapedTitle,
+      content: `<div>
             <h1>${escapedTitle}</h1>
             <div><p><a href="${url}">Link to original</a></p></div>
             <div>${contentHtml}</div>
           </div>`,
-      };
-    })
-  );
+    });
+  }
   return { chapters, resources: Object.values(resources) };
 };
 

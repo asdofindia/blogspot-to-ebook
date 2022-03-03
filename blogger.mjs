@@ -48,7 +48,7 @@ export const getOlderPostsFrom = async (startUrl) => {
 
   while (currentUrl) {
     await getOneBloggerPost(currentUrl).then(({ older, newer, ...data }) => {
-      chapters.unshift({
+      chapters.push({
         ...data,
       });
       currentUrl = older;
@@ -60,9 +60,9 @@ export const getOlderPostsFrom = async (startUrl) => {
 const getListPage = async (url) => {
   const dom = await urlToDom(url);
   const hasArchive = !!dom.window.document.querySelector("ul.hierarchy");
-  const posts = [...dom.window.document.querySelectorAll(".post-title a")].map(
-    (a) => a?.href
-  );
+  const posts = [
+    ...dom.window.document.querySelectorAll("a.timestamp-link"),
+  ].map((a) => a?.href);
   const older = dom.window.document.querySelector(olderSelector)?.href;
   return {
     posts,
@@ -71,24 +71,23 @@ const getListPage = async (url) => {
   };
 };
 
-const getAllPostLinks = async (url) => {
+async function* getAllPostLinks(url) {
   let currentUrl = url;
-  let links = [];
 
   while (currentUrl) {
     const { posts, older } = await getListPage(currentUrl);
-    links = links.concat(posts);
+    for (const link of posts) {
+      yield link;
+    }
     currentUrl = older;
   }
+}
 
-  links.reverse();
-  return links;
-};
-
-const getPostsFromList = async (url) => {
-  const allLinks = await getAllPostLinks(url);
-  return await Promise.all(allLinks.map((link) => getOneBloggerPost(link)));
-};
+async function* getPostsFromList(url) {
+  for await (const link of getAllPostLinks(url)) {
+    yield await getOneBloggerPost(link);
+  }
+}
 
 export const getFromBlogger = (url) => {
   const parsedUrl = new URL(url);
