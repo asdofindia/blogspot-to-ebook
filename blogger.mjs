@@ -34,26 +34,23 @@ const domToStructured = (dom) => {
     older: dom.window.document.querySelector(olderSelector)?.href,
     id: createId(dom.window.document.querySelector(timeStampSelector)?.href),
     bodyDom: dom.window.document.querySelector(bodySelector),
+    url: dom.window.document.URL,
   };
 };
+
+const getOneBloggerPost = (postUrl) => urlToDom(postUrl).then(domToStructured);
 
 export const getFromBlogger = async (startUrl) => {
   let currentUrl = startUrl;
   const chapters = [];
 
   while (currentUrl) {
-    await urlToDom(currentUrl)
-      .then(domToStructured)
-      .then(({ title, bodyDom, older, id }) => {
-        console.log(title);
-        chapters.unshift({
-          id,
-          title,
-          bodyDom,
-          url: currentUrl,
-        });
-        currentUrl = older;
+    await getOneBloggerPost(currentUrl).then(({ older, newer, ...data }) => {
+      chapters.unshift({
+        ...data,
       });
+      currentUrl = older;
+    });
   }
   return chapters;
 };

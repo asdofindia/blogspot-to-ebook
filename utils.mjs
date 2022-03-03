@@ -50,7 +50,11 @@ export const escapeHtml = (html) =>
 
 const fetchUrlText = async (url) => {
   const cached = getCache(url);
-  if (cached) return cached;
+  if (cached) {
+    console.log(`Got ${url} from cache`);
+    return cached;
+  }
+  console.log(`Downloading post ${url}...`);
   return fetch(url).then(async (res) => {
     const text = await res.text();
     setCache(url, text);
