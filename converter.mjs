@@ -21,10 +21,29 @@ Find Akshay's contact details at https://asd.learnlearn.in/about/#contact
 import { getFromBlogger } from "./blogger.mjs";
 import { createEpub } from "./epub.js";
 import { processBlogPosts } from "./utils.mjs";
+import { getFromWordPress } from "./wordpress.mjs";
 
-const currentUrl = process.argv[2];
+const detectPlatform = (url) => {
+  if (url.includes("blogspot")) {
+    return "blogger";
+  }
+  if (url.includes("wordpress")) {
+    return "wordpress";
+  }
+  console.error(
+    "Could not detect whether blogger/wordpress from url. Pass the last parameter"
+  );
+  process.exit(1);
+};
+const url = process.argv[2];
+const platform = process.argv[6] || detectPlatform(url);
 
-const blogPosts = await getFromBlogger(currentUrl);
+const engines = {
+  blogger: getFromBlogger,
+  wordpress: getFromWordPress,
+};
+
+const blogPosts = await engines[platform](url);
 
 const { chapters, resources } = await processBlogPosts(blogPosts);
 

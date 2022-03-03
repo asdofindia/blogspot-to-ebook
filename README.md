@@ -1,5 +1,7 @@
 # Blogpost to EPUB eBook
 
+(WordPress / Blogger (Blogspot) only)
+
 Are you the kind of person who sees an interesting new blog and want to read from start to finish?
 
 Do you wish it was easier to navigate the layout? Do you wish you got the whole thing as a book?
@@ -14,9 +16,19 @@ Here's a tool for you
 
 ## Running
 
-* Get to the URL of the latest (newest) blogpost in the blog. (The tool will go find older links starting from this post)
-* `node --experimental-fetch converter.mjs https://blog.learnlearn.in/2021/11/why-i-am-back-on-whatsapp.html blissful-life.epub "Blissful Life" "Akshay S Dinesh"`
-* (Here, the parameters are: URL of the latest post, output file name, title of the book, author's name)
+### For blogger with non-modern themes
+
+* Get to the URL of the latest (newest) post in the blog. (The tool will go find older links starting from this post)
+* `node --experimental-fetch converter.mjs https://blog.learnlearn.in/2021/11/why-i-am-back-on-whatsapp.html blissful-life.epub "Blissful Life" "Akshay S Dinesh" blogger` 
+* (Here, the parameters are: URL of the latest post, output file name, title of the book, author's name, blogger/wordpress)
+
+### For blogger with modern themes
+
+* `node --experimental-fetch converter.mjs https://shares.learnlearn.in shares.epub "Shares" "Akshay S Dinesh" blogger`
+
+### For wordpress
+
+* `node --experimental-fetch converter.mjs https://asdofindia.wordpress.com akshay-wp.epub "Akshay's wordpress" "Akshay S Dinesh" wordpress`
 
 ## Cleaning cache
 

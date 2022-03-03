@@ -80,16 +80,22 @@ export const swapResources = async (resources, dom) => {
       };
     } else {
       console.log(`Downloading image: ${href}`);
-      const res = await fetch(href);
-      const blob = await res.arrayBuffer();
-      const mediaType = res.headers.get("content-type");
-      resources[href] = {
-        id: createId(href),
-        mediaType,
-        content: Buffer.from(blob),
-      };
+      try {
+        const res = await fetch(href);
+        const blob = await res.arrayBuffer();
+        const mediaType = res.headers.get("content-type");
+        resources[href] = {
+          id: createId(href),
+          mediaType,
+          content: Buffer.from(blob),
+        };
+      } catch {
+        console.error(`Failed to download. Skipping...`);
+      }
     }
-    node.src = `./${resources[href].id}`;
+    if (resources[href]) {
+      node.src = `./${resources[href]?.id}`;
+    }
   }
   return dom;
 };
