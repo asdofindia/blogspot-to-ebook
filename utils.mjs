@@ -70,15 +70,25 @@ export const swapResources = async (resources, dom) => {
   for (const node of nodelist) {
     const href = node.src;
     if (resources.hasOwnProperty(href)) node.src = `./${resources[href].id}`;
-    console.log(`Downloading image: ${href}`);
-    const res = await fetch(href);
-    const blob = await res.arrayBuffer();
-    const mediaType = res.headers.get("content-type");
-    resources[href] = {
-      id: createId(href),
-      mediaType,
-      content: Buffer.from(blob),
-    };
+    if (href.startsWith("data:image")) {
+      // https://github.com/DiegoZoracKy/image-data-uri/blob/c4e7fb976283362cd3b8f309d413c99ebef167bd/lib/image-data-uri.js#L24
+      const matches = href.match("data:(image/.*);base64,(.*)");
+      resources[href] = {
+        id: createId(href),
+        mediaType: matches[1],
+        content: new Buffer(matches[2], "base64"),
+      };
+    } else {
+      console.log(`Downloading image: ${href}`);
+      const res = await fetch(href);
+      const blob = await res.arrayBuffer();
+      const mediaType = res.headers.get("content-type");
+      resources[href] = {
+        id: createId(href),
+        mediaType,
+        content: Buffer.from(blob),
+      };
+    }
     node.src = `./${resources[href].id}`;
   }
   return dom;
