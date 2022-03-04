@@ -155,7 +155,7 @@ const createEpub = async ({
             <meta property="dcterms:modified">2012-02-27T16:38:35Z</meta>
          </metadata>
          <manifest>
-            <item href="htmltoc.xml" id="htmltoc" media-type="application/xhtml+xml" properties="nav" />
+            <item href="htmltoc.xhtml" id="htmltoc" media-type="application/xhtml+xml" properties="nav" />
             ${manifestItems.map(createManifestItem).join("\n")}
          </manifest>
          <spine>
