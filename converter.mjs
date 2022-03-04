@@ -53,17 +53,17 @@ const confirmed = await inquirer.prompt(
     {
       type: "input",
       name: "outputPath",
-      default: "output.epub"
+      default: "output.epub",
     },
     {
       type: "input",
       name: "title",
-      default: "Title"
+      default: "Title",
     },
     {
       type: "input",
       name: "creator",
-      default: "Creator"
+      default: "Creator",
     },
     {
       type: "list",
@@ -76,7 +76,7 @@ const confirmed = await inquirer.prompt(
 
 const blogPosts = await engines[confirmed.platform](confirmed.url);
 
-const { chapters, resources } = await processBlogPosts(blogPosts);
+const chapters = await processBlogPosts(blogPosts);
 
 const identifier = `${title}.${creator}`.replace(/\W/g, ".");
 
@@ -87,7 +87,7 @@ const option = {
   language: "en",
   identifier,
   chapters,
-  resources,
+  reverseChapters: true,
 };
 
 await createEpub(option);

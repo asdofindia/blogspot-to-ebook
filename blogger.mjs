@@ -42,20 +42,15 @@ const domToStructured = (dom) => {
 
 const getOneBloggerPost = (postUrl) => urlToDom(postUrl).then(domToStructured);
 
-export const getOlderPostsFrom = async (startUrl) => {
+async function* getOlderPostsFrom(startUrl) {
   let currentUrl = startUrl;
-  const chapters = [];
 
   while (currentUrl) {
-    await getOneBloggerPost(currentUrl).then(({ older, newer, ...data }) => {
-      chapters.push({
-        ...data,
-      });
-      currentUrl = older;
-    });
+    const data = await getOneBloggerPost(currentUrl);
+    yield data;
+    currentUrl = data.older;
   }
-  return chapters;
-};
+}
 
 const getListPage = async (url) => {
   const dom = await urlToDom(url);

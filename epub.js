@@ -36,12 +36,9 @@ const createEpub = async ({
   language,
   identifier, // which is a unique ID
 
-  // a list of
+  // a list of special object called chapters
   chapters,
-  // and a list of extra resources
-  resources,
-  // or a directory of resources
-  resourceDirectory,
+  reverseChapters,
 
   // and an
   outputPath,
@@ -71,13 +68,69 @@ const createEpub = async ({
     { name: "META-INF/container.xml" }
   );
 
-  // To create the root file for package.opf we need to first process the chapters
-  // and create the necessary items required for the manifest and the spine
-  const { manifestItems, spineItems } = await processChapters(
-    chapters,
-    resources,
-    resourceDirectory
+  // Each chapter and its resources has to be put in package.opf manifest
+  // Similarly each chapter has to be put in toc
+  // We will collect these entries as we process each chapter
+  const manifestItems = [];
+  const tocItems = [];
+
+  // Now let us process each chapter
+  for await (const chapter of chapters) {
+    // Add the chapter to archive)
+    archive.append(chapter.content, { name: `${chapter.id}.xhtml` });
+
+    // Also add the chapter to manifest and toc
+    manifestItems.push({
+      id: chapter.id,
+      href: `${chapter.id}.xhtml`,
+      mediaType: "application/xhtml+xml",
+    });
+    tocItems.push({
+      id: chapter.id,
+      title: chapter.title,
+    });
+
+    // Within the chapter, each resource has to be added too
+    for await (const resource of chapter.resources) {
+      // to archive
+      archive.append(resource.content, { name: resource.id });
+      // to manifest
+      manifestItems.push({
+        id: resource.id,
+        href: resource.id,
+        mediaType: resource.mediaType,
+      });
+    }
+  }
+
+  // If chapters are given in reverse by the user, we have to reverse it
+  if (reverseChapters) {
+    tocItems.reverse();
+  }
+  // Now we can create toc
+
+  // Each entry in toc will look like:
+  const createTocEntry = (item) =>
+    `<li><a href="${item.id}.xhtml">${item.title}</a></li>`;
+
+  archive.append(
+    `<?xml version="1.0" encoding="utf-8"?>
+    <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+    <head></head>
+      <body>
+        <nav epub:type="toc" id="toc" role="doc-toc">
+          <h1 class="title">Table of Contents</h1>
+          <ol>
+            ${tocItems.map(createTocEntry).join("\n")}
+          </ol>
+        </nav>
+      </body>
+    </html>
+    `,
+    { name: "htmltoc.xhtml" }
   );
+
+  // Now the package.opf
 
   // Each item in the manifest will look like
   // <item href="somelink.html" id="some-id" media-type="type"/>
@@ -85,7 +138,6 @@ const createEpub = async ({
     <item href="${item.href}" 
           id="${item.id}"
           media-type="${item.mediaType}"
-          ${item.id === "htmltoc" ? ` properties="nav"` : ``}
     />`;
 
   // Each spine item will look like
@@ -103,82 +155,20 @@ const createEpub = async ({
             <meta property="dcterms:modified">2012-02-27T16:38:35Z</meta>
          </metadata>
          <manifest>
+            <item href="htmltoc.xml" id="htmltoc" media-type="application/xhtml+xml" properties="nav" />
             ${manifestItems.map(createManifestItem).join("\n")}
          </manifest>
          <spine>
-            ${spineItems.map(createSpineItem).join("\n")}
+            <itemref idref="htmltoc" />
+            ${tocItems.map(createSpineItem).join("\n")}
          </spine>
       </package>`,
     { name: "package.opf" }
   );
 
-  // The last thing we need to do is add all the actual items from manifestItems to the archive
-  manifestItems.map((item) =>
-    archive.append(item.content, { name: `${item.href}` })
-  );
-
   // Now we can finalize the archive
   archive.finalize();
   // And the package is ready!
-};
-
-// Processing chapters is just doing some data transformations
-const processChapters = (chapters, resources, resourceDirectory) => {
-  // First let us add a Table of Contents chapter
-
-  // Each entry in toc will look like:
-  const createTocEntry = (item) =>
-    `<li><a href="${item.id}.xhtml">${item.title}</a></li>`;
-
-  // Now we can create the TOC itself
-  const toc = {
-    id: "htmltoc",
-    href: "htmltoc.xhtml",
-    title: "Table of Contents",
-    mediaType: "application/xhtml+xml",
-    content: `<?xml version="1.0" encoding="utf-8"?>
-    <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
-    <head></head>
-    <body>
-    <nav epub:type="toc" id="toc" role="doc-toc">
-    <h1 class="title">Table of Contents</h1>
-    <ol>
-      ${chapters.map(createTocEntry).join("\n")}
-    </ol>
-    </nav>
-    </body>
-    </html>
-    `,
-  };
-  // Now we will add TOC as the first chapter
-  chapters.unshift(toc);
-
-  // Let us create the items for spine now.
-  // Spine needs only the id. But the order is important.
-  const spineItems = chapters.map((chapter) => ({
-    id: chapter.id,
-  }));
-
-  // On to manifest items
-  // The order doesn't matter here
-  const manifestItems = [
-    ...chapters.map((chapter) => ({
-      id: chapter.id,
-      href: `${chapter.id}.xhtml`,
-      mediaType: "application/xhtml+xml",
-      content: chapter.content,
-    })),
-    ...(resources?.map((resource) => ({
-      id: resource.id,
-      href: `${resource.id}`,
-      mediaType: resource.mediaType,
-      content: resource.content,
-    })) || []),
-  ];
-  return {
-    spineItems,
-    manifestItems,
-  };
 };
 
 module.exports = { createEpub };

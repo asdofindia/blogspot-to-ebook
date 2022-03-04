@@ -47,22 +47,17 @@ const domToStructured = (dom) => {
 
 const getOnePost = (postUrl) => urlToDom(postUrl).then(domToStructured);
 
-const getOlderPostsFrom = async (startUrl) => {
+async function* getOlderPostsFrom(startUrl) {
   let currentUrl = startUrl;
-  const chapters = [];
 
   while (currentUrl) {
-    await getOnePost(currentUrl).then(({ older, newer, ...data }) => {
-      chapters.push({
-        ...data,
-      });
-      currentUrl = older;
-    });
+    const data = await getOnePost(currentUrl);
+    yield data;
+    currentUrl = data.older;
   }
-  return chapters;
-};
+}
 
-const getNewerPostsFrom = async (startUrl) => {
+async function* getNewerPostsFrom(startUrl) {
   let currentUrl = startUrl;
   const chapters = [];
   while (currentUrl) {
@@ -73,8 +68,8 @@ const getNewerPostsFrom = async (startUrl) => {
       currentUrl = newer;
     });
   }
-  return chapters;
-};
+  yield* chapters;
+}
 
 const getListPage = async (url) => {
   const dom = await urlToDom(url);
@@ -86,7 +81,7 @@ const getListPage = async (url) => {
   };
 };
 
-export const getFromWordPress = async (url) => {
+export async function* getFromWordPress(url) {
   const parsedUrl = new URL(url);
   if (parsedUrl.pathname === "/") {
     console.log(
@@ -95,14 +90,12 @@ export const getFromWordPress = async (url) => {
     const guessedStart = (await getListPage(url))?.posts?.[0];
     const { older, newer } = await getOnePost(guessedStart);
     if (newer) {
-      return [
-        ...(await getNewerPostsFrom(newer)),
-        ...(await getOlderPostsFrom(guessedStart)),
-      ];
+      yield* getNewerPostsFrom(newer);
+      yield* getOlderPostsFrom(guessedStart);
     } else {
-      return getOlderPostsFrom(guessedStart);
+      yield* getOlderPostsFrom(guessedStart);
     }
   } else {
-    return getOlderPostsFrom(url);
+    yield* getOlderPostsFrom(url);
   }
-};
+}

@@ -65,7 +65,8 @@ const fetchUrlText = async (url) => {
 export const urlToDom = (url) =>
   fetchUrlText(url).then((text) => new JSDOM(text, { url }));
 
-const swapResources = async (resources, dom) => {
+const swapResources = async (dom) => {
+  const resources = {};
   const nodelist = dom.querySelectorAll("img");
   for (const node of nodelist) {
     const href = node.src;
@@ -98,19 +99,20 @@ const swapResources = async (resources, dom) => {
       node.srcset = "";
     }
   }
-  return dom;
+  return { dom, resources: Object.values(resources) };
 };
 
-export const processBlogPosts = async (blogPosts) => {
-  const resources = {};
+export async function* processBlogPosts(blogPosts) {
   const chapters = [];
   for await (const { title, bodyDom, id, url } of blogPosts) {
     const escapedTitle = escapeHtml(title);
-    const domSwappedWithLocalImages = await swapResources(resources, bodyDom);
+    const { resources, dom: domSwappedWithLocalImages } = await swapResources(
+      bodyDom
+    );
     const contentHtml = xmlserializer.serializeToString(
       domSwappedWithLocalImages
     );
-    chapters.unshift({
+    yield {
       id,
       title: escapedTitle,
       content: `<div>
@@ -118,7 +120,7 @@ export const processBlogPosts = async (blogPosts) => {
             <div><p><a href="${url}">Link to original</a></p></div>
             <div>${contentHtml}</div>
           </div>`,
-    });
+      resources,
+    };
   }
-  return { chapters, resources: Object.values(resources) };
-};
+}
