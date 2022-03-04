@@ -1,12 +1,14 @@
-# Blogpost to EPUB eBook
-
-(WordPress / Blogger (Blogspot) only)
+# Blog to EPUB eBook
 
 Are you the kind of person who sees an interesting new blog and want to read from start to finish?
 
 Do you wish it was easier to navigate the layout? Do you wish you got the whole thing as a book?
 
 Here's a tool for you
+
+## Features
+* <img src="http://www.blogger.com/favicon.ico" width=16 height=16/> Blogger/Blogspot to eBook
+* <img src="http://wordpress.com/favicon.ico" width=16 height=16/> WordPress to eBook
 
 ## Installation
 
