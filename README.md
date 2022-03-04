@@ -7,8 +7,11 @@ Do you wish it was easier to navigate the layout? Do you wish you got the whole 
 Here's a tool for you
 
 ## Features
-* <img src="http://www.blogger.com/favicon.ico" width=16 height=16/> Blogger/Blogspot to eBook
-* <img src="http://wordpress.com/favicon.ico" width=16 height=16/> WordPress to eBook
+* <img src="http://www.blogger.com/favicon.ico" width=16 height=16/> Blogger/Blogspot to eBook (epub)
+* <img src="http://wordpress.com/favicon.ico" width=16 height=16/> WordPress to eBook (epub)
+* Interactive mode and non-interactive mode
+* Automatic table of contents generation (links to each post)
+* Chronologically ordered (allowing reading from the earliest post in a blog)
 
 ## Installation
 
