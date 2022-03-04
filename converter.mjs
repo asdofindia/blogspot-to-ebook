@@ -74,7 +74,11 @@ const confirmed = await inquirer.prompt(
   { url, outputPath, title, creator, platform }
 );
 
-const blogPosts = await engines[confirmed.platform](confirmed.url);
+const sanitizedUrl = confirmed.url.startsWith("http")
+  ? confirmed.url
+  : `http://${confirmed.url}`;
+
+const blogPosts = await engines[confirmed.platform](sanitizedUrl);
 
 const chapters = await processBlogPosts(blogPosts);
 
