@@ -68,6 +68,7 @@ const confirmed = await inquirer.prompt(
     {
       type: "list",
       name: "platform",
+      default: ({ url }) => detectPlatform(url),
       choices: ["blogger", "wordpress"],
     },
   ],
