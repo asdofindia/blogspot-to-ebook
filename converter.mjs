@@ -85,8 +85,12 @@ const chapters = await processBlogPosts(blogPosts);
 
 const identifier = `${title}.${creator}`.replace(/\W/g, ".");
 
+const outputWithEpubExtension = confirmed.outputPath.endsWith(".epub")
+  ? confirmed.outputPath
+  : confirmed.outputPath + ".epub";
+
 const option = {
-  outputPath: confirmed.outputPath,
+  outputPath: outputWithEpubExtension,
   title: confirmed.title,
   creator: confirmed.creator,
   language: "en",
@@ -96,4 +100,4 @@ const option = {
 };
 
 await createEpub(option);
-console.log(`Output ready at ${confirmed.outputPath}`);
+console.log(`Output ready at ${outputWithEpubExtension}`);
