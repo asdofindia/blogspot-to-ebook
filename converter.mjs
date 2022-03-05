@@ -33,6 +33,12 @@ const detectPlatform = (url) => {
   }
 };
 
+const detectUrlType = (url) => {
+  const parsedUrl = new URL(url);
+  if (parsedUrl.pathname === "/") return "listing-page";
+  return "single-post";
+};
+
 const engines = {
   blogger: getFromBlogger,
   wordpress: getFromWordPress,
@@ -43,12 +49,20 @@ const outputPath = process.argv[3];
 const title = process.argv[4];
 const creator = process.argv[5];
 const platform = process.argv[6] || detectPlatform(url);
+const urlType = process.argv[7];
 
 const confirmed = await inquirer.prompt(
   [
     {
       type: "input",
       name: "url",
+    },
+    {
+      type: "list",
+      message: "Is the url that of a listing page or a single post?",
+      name: "urlType",
+      default: ({ url }) => detectUrlType(url),
+      choices: ["listing-page", "single-post"],
     },
     {
       type: "input",
@@ -72,14 +86,17 @@ const confirmed = await inquirer.prompt(
       choices: ["blogger", "wordpress"],
     },
   ],
-  { url, outputPath, title, creator, platform }
+  { url, outputPath, title, creator, platform, urlType }
 );
 
 const sanitizedUrl = confirmed.url.startsWith("http")
   ? confirmed.url
   : `http://${confirmed.url}`;
 
-const blogPosts = await engines[confirmed.platform](sanitizedUrl);
+const blogPosts = await engines[confirmed.platform](
+  sanitizedUrl,
+  confirmed.urlType
+);
 
 const chapters = await processBlogPosts(blogPosts);
 

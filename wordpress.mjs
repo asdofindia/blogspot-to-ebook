@@ -81,9 +81,8 @@ const getListPage = async (url) => {
   };
 };
 
-export async function* getFromWordPress(url) {
-  const parsedUrl = new URL(url);
-  if (parsedUrl.pathname === "/") {
+export async function* getFromWordPress(url, urlType) {
+  if (urlType === "listing-page") {
     console.log(
       `List detection on WordPress is experimental. Try passing individual blogpost link for better results`
     );
