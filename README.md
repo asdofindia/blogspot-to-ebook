@@ -23,22 +23,24 @@ Here's a tool for you
 
 ### Interactively
 
-* `node --experimental-fetch converter.mjs`
+* `node converter.mjs`
 * Answer questions
+
+(If your node version is <18, you will have to do `node --experimental-fetch converter.mjs`)
 
 ### For blogger with non-modern themes
 
 * Get to the URL of the latest (newest) post in the blog. (The tool will go find older links starting from this post)
-* `node --experimental-fetch converter.mjs https://blog.learnlearn.in/2021/11/why-i-am-back-on-whatsapp.html blissful-life.epub "Blissful Life" "Akshay S Dinesh" blogger` 
+* `node converter.mjs https://blog.learnlearn.in/2021/11/why-i-am-back-on-whatsapp.html blissful-life.epub "Blissful Life" "Akshay S Dinesh" blogger` 
 * (Here, the parameters are: URL of the latest post, output file name, title of the book, author's name, blogger/wordpress)
 
 ### For blogger with modern themes
 
-* `node --experimental-fetch converter.mjs https://shares.learnlearn.in shares.epub "Shares" "Akshay S Dinesh" blogger`
+* `node converter.mjs https://shares.learnlearn.in shares.epub "Shares" "Akshay S Dinesh" blogger`
 
 ### For wordpress
 
-* `node --experimental-fetch converter.mjs https://asdofindia.wordpress.com akshay-wp.epub "Akshay's wordpress" "Akshay S Dinesh" wordpress`
+* `node converter.mjs https://asdofindia.wordpress.com akshay-wp.epub "Akshay's wordpress" "Akshay S Dinesh" wordpress`
 
 ## Cleaning cache
 
