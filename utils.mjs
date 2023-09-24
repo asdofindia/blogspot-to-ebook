@@ -54,7 +54,7 @@ const fetchUrlText = async (url) => {
     console.log(`Got ${url} from cache`);
     return cached;
   }
-  console.log(`Downloading text ${url}...`);
+  console.log(`Downloading text ${url} ...`);
   return fetch(url).then(async (res) => {
     const text = await res.text();
     setCache(url, text);
