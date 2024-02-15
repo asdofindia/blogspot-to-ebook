@@ -29,6 +29,7 @@ const timeStampSelector = ".timestamp-link";
 const domToStructured = (dom) => {
   const title =
     dom.window.document.querySelector(titleSelector)?.textContent?.trim() ||
+    dom.window.document.title?.trim() ||
     "Untitled";
   return {
     title,

@@ -28,6 +28,7 @@ const bodySelector = ".entry-content";
 const domToStructured = (dom) => {
   const title =
     dom.window.document.querySelector(titleSelector)?.textContent?.trim() ||
+    dom.window.document.title?.trim() ||
     "Untitled";
 
   const bodyDom = dom.window.document.querySelector(bodySelector);
